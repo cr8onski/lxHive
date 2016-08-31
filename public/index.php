@@ -186,28 +186,24 @@ $app->hook('slim.before.dispatch', function () use ($app) {
     // Auth - token
     $app->container->singleton('auth', function () use ($app) {
         if (!$app->request->isOptions() && !($app->request->getPathInfo() === '/about')) {
+            
+
+            // Abstract validation of authentication
+            $abstractAuthValidator = new AuthValidator($app);
+            $abstractAuthValidator->validateRequest($app->request);
+
             $basicAuthService = new BasicAuthService($app);
             $oAuthService = new OAuthService($app);
 
-            $token = null;
-
-            try {
+            if ($abstractAuthValidator->isRequestValid($app->request)) {
                 $token = $oAuthService->extractToken($app->request);
                 $app->requestLog->addRelation('oAuthToken', $token)->save();
-            } catch (AuthFailureException $e) {
-                // Ignore
-            }
-
-            try {
+            } else if ($basicAuthService->isRequestValid($app->request)) {
                 $token = $basicAuthService->extractToken($app->request);
                 $app->requestLog->addRelation('basicToken', $token)->save();
-            } catch (AuthFailureException $e) {
-                // Ignore
-            }
-
-            if (null === $token) {
+            } else {
                 throw new \Exception('Credentials invalid!', Resource::STATUS_UNAUTHORIZED);
-            }
+            }        
 
             return $token;
         }

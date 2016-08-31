@@ -29,6 +29,17 @@ use Slim\Http\Request;
 interface AuthInterface
 {
     /**
+     * Check if this Auth checker is applicable for this request.
+     *
+     * @param Request $request Slim request
+     *
+     * @throws AuthFailureException If authentication cannot be extracted from the Request
+     *
+     * @return bool
+     */
+    public function isRequestValid(Request $request);
+
+    /**
      * Fetches the token document, parsing it from the request.
      *
      * @param Request $request Slim request
