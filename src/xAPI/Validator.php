@@ -118,4 +118,25 @@ abstract class Validator
             throw new Exception('X-Experience-API-Version header missing.', Resource::STATUS_BAD_REQUEST);
         }
     }
+
+    /**
+     * Validates an ISO8601 query param on two levels:
+     *  1. is it an ISO8601 timestamp?
+     *  2. is it parsable into a PHP Datetime instance?
+     *
+     * @param string $str
+     * @return void
+     */
+    public static function validateISO8601DateTimeQuery($str)
+    {
+        if(!is_string($str)){
+            throw new Exception('Timestamp is not a string.', Resource::STATUS_BAD_REQUEST);
+        }
+        if(!$str){
+            throw new Exception('Empty timestamp property.', Resource::STATUS_BAD_REQUEST);
+        }
+        if(!Util\Date::validateISO8601Date($str)){
+            throw new Exception($str . ' is not a valid timestamp.', Resource::STATUS_BAD_REQUEST);
+        }
+    }
 }

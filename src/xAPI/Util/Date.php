@@ -80,4 +80,38 @@ class Date
 
         return $output;
     }
+
+    /**
+     * Validates a string as ISO 8601 date. Use this function before trying to parse strings, which can result in non-catchable fatal exceptions.
+     * @param bool $mongo check strict for convertable PHP/Mongo string. ISO 8601 is very broadly defined and not all patterns are convertable out of the box into dateTime instances
+     * @return bool
+     */
+
+    public static function validateISO8601Date($str, $mongo = true)
+    {
+
+        if($mongo && preg_match('/^\d{4,}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/', $str)){
+            return true;
+        };
+
+        // ISO date, including usec, positive, negative years and big years (consider sientific use)
+        if(!$mongo && preg_match('/^[+\-]?\d{4,}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/', $str)){
+            return true;
+        };
+
+        // week number
+        if(preg_match('/^([0-9]{4})-?W(5[0-3]|[1-4][0-9]|0[1-9])$/', $str)){
+            return true;
+        };
+        // week number + day
+        if(preg_match('/^([0-9]{4})-?W(5[0-3]|[1-4][0-9]|0[1-9])-?([1-7])$/', $str)){
+            return true;
+        };
+
+        if(!$mongo && preg_match('/^([0-9]{4})-?(36[0-6]|3[0-5][0-9]|[12][0-9]{2}|0[1-9][0-9]|00[1-9])$/', $str)){
+            return true;
+        };
+
+        return false;
+    }
 }

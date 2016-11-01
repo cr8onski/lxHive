@@ -25,6 +25,7 @@
 namespace API\Service;
 
 use API\Service;
+use API\Validator;
 use API\Resource;
 use API\Util;
 use Slim\Helper\Set;
@@ -99,6 +100,8 @@ class AgentProfile extends Service
         $cursor->where('agent', $agent);
 
         if ($params->has('since')) {
+            Validator::validateISO8601DateTimeQuery($params->get('since'));
+
             $since = Util\Date::dateStringToMongoDate($params->get('since'));
             $cursor->whereGreaterOrEqual('mongoTimestamp', $since);
         }
@@ -360,7 +363,7 @@ class AgentProfile extends Service
         // Add to log
         $this->getSlim()->requestLog->addRelation('agentProfiles', $result)->save();
 
-        $result->delete();  
+        $result->delete();
 
         return $this;
     }

@@ -25,6 +25,7 @@
 namespace API\Service;
 
 use API\Service;
+use API\Validator;
 use MongoDate;
 use API\Resource;
 use API\Util;
@@ -475,6 +476,10 @@ class Statement extends Service
                     }
                 }
 
+                if (isset($statement['timestamp'])) {
+                     Validator::validateISO8601DateTimeQuery($statement['timestamp']);
+                }
+
                 $statementDocument = $collection->createDocument();
                 // Overwrite authority - unless it's a super token and manual authority is set
                 if (!($this->getAccessToken()->isSuperToken() && isset($statement['authority'])) || !isset($statement['authority'])) {
@@ -544,6 +549,10 @@ class Statement extends Service
                         throw new Exception('An existing statement already exists with the same ID and is different from the one provided.', Resource::STATUS_CONFLICT);
                     }
                 }
+            }
+
+            if (isset($body['timestamp'])) {
+                Validator::validateISO8601DateTimeQuery($body['timestamp']);
             }
 
             $statementDocument = $collection->createDocument();
@@ -703,6 +712,10 @@ class Statement extends Service
             }
         } else {
             $body['id'] = $params->get('statementId');
+        }
+
+        if (isset($body['timestamp'])) {
+            Validator::validateISO8601DateTimeQuery($body['timestamp']);
         }
 
         // ID exists, check if different or conflict

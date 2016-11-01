@@ -25,6 +25,7 @@
 namespace API\Service;
 
 use API\Service;
+use API\Validator;
 use API\Resource;
 use API\Util;
 use Slim\Helper\Set;
@@ -123,6 +124,8 @@ class ActivityState extends Service
         }
 
         if ($params->has('since')) {
+            Validator::validateISO8601DateTimeQuery($params->get('since'));
+
             $since = Util\Date::dateStringToMongoDate($params->get('since'));
             $cursor->whereGreaterOrEqual('mongoTimestamp', $since);
         }

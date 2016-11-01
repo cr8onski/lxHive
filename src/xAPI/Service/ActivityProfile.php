@@ -25,6 +25,7 @@
 namespace API\Service;
 
 use API\Service;
+use API\Validator;
 use API\Resource;
 use API\Util;
 use Slim\Helper\Set;
@@ -74,7 +75,7 @@ class ActivityProfile extends Service
             $cursor->where('activityId', $params->get('activityId'));
 
             if ($cursor->count() === 0) {
-                throw new Exception('Activity state does not exist.', Resource::STATUS_NOT_FOUND);
+                throw new Exception('Activity profile does not exist.', Resource::STATUS_NOT_FOUND);
             }
 
             $this->cursor   = $cursor;
@@ -86,6 +87,8 @@ class ActivityProfile extends Service
         $cursor->where('activityId', $params->get('activityId'));
 
         if ($params->has('since')) {
+            Validator::validateISO8601DateTimeQuery($params->get('since'));
+
             $since = Util\Date::dateStringToMongoDate($params->get('since'));
             $cursor->whereGreaterOrEqual('mongoTimestamp', $since);
         }

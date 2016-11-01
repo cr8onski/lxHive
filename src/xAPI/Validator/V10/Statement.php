@@ -58,6 +58,15 @@ class Statement extends Validator
         if (!$this->getSchemaValidator()->isValid()) {
             $this->throwErrors('GET parameters do not validate.', $this->getSchemaValidator()->getErrors());
         }
+
+        if(isset($data['since'])){
+            self::validateISO8601DateTimeQuery($data['since']);
+        }
+
+        if(isset($data['until'])){
+            self::validateISO8601DateTimeQuery($data['until']);
+        }
+
     }
 
     // POST-ing a statement validation
